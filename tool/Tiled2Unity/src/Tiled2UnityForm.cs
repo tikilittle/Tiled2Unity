@@ -85,7 +85,7 @@ namespace Tiled2Unity
 
             this.buttonFolderBrowser.Enabled = false;
             this.buttonViewer.Enabled = false;
-            this.buttonExport.Enabled = false;
+            //this.buttonExport.Enabled = false;
 
             try
             {
@@ -117,7 +117,8 @@ namespace Tiled2Unity
                 exportPathExists = true;
             }
 
-            this.buttonExport.Enabled = (this.tmxExporter != null) && exportPathExists;
+            //this.buttonExport.Enabled = (this.tmxExporter != null) && exportPathExists;
+			this.buttonExport.Enabled = true;
         }
 
         private void ReportSummary()
@@ -148,7 +149,7 @@ namespace Tiled2Unity
 
         void Program_OnWriteLine(string line)
         {
-            WriteText(line);
+            //WriteText(line);
         }
 
         void Program_OnWriteWarning(string warning)
@@ -235,8 +236,11 @@ namespace Tiled2Unity
 
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+				System.Console.WriteLine(dlg.SelectedPath);
+				System.Console.WriteLine(Path.GetFullPath(dlg.SelectedPath));
                 Properties.Settings.Default.LastExportDirectory = Path.GetFullPath(dlg.SelectedPath);
                 Properties.Settings.Default.Save();
+				System.Console.WriteLine(Properties.Settings.Default.LastExportDirectory);
             }
         }
 

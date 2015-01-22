@@ -91,7 +91,7 @@
             // buttonExport
             // 
             this.buttonExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonExport.Enabled = false;
+            this.buttonExport.Enabled = true;
             this.buttonExport.Location = new System.Drawing.Point(659, 481);
             this.buttonExport.Name = "buttonExport";
             this.buttonExport.Size = new System.Drawing.Size(180, 66);
@@ -119,7 +119,7 @@
             this.textBoxExportFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Tiled2Unity.Properties.Settings.Default, "LastExportDirectory", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBoxExportFolder.Location = new System.Drawing.Point(74, 481);
             this.textBoxExportFolder.Name = "textBoxExportFolder";
-            this.textBoxExportFolder.ReadOnly = true;
+            this.textBoxExportFolder.ReadOnly = false;
             this.textBoxExportFolder.Size = new System.Drawing.Size(551, 20);
             this.textBoxExportFolder.TabIndex = 2;
             this.textBoxExportFolder.Text = global::Tiled2Unity.Properties.Settings.Default.LastExportDirectory;

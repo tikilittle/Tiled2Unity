@@ -43,18 +43,21 @@ namespace Tiled2Unity
             }
         }
 
+		public static TmxMap thisTmxMap;
+
         private StringWriter BuildObjString()
         {
             // Creates the text for a Wavefront OBJ file for the TmxMap
             StringWriter objWriter = new StringWriter();
 
             // Gather the information for every face
-            var faces = from layer in this.tmxMap.Layers
+			thisTmxMap = this.tmxMap;
+			var faces = from layer in thisTmxMap.Layers
                         where layer.Visible == true
 
                         // Draw order forces us to visit tiles in a particular order
-                        from y in (this.tmxMap.DrawOrderVertical == 1) ? Enumerable.Range(0, layer.Height) : Enumerable.Range(0, layer.Height).Reverse()
-                        from x in (this.tmxMap.DrawOrderHorizontal == 1) ? Enumerable.Range(0, layer.Width) : Enumerable.Range(0, layer.Width).Reverse()
+						from y in (thisTmxMap.DrawOrderVertical == 1) ? Enumerable.Range(0, layer.Height) : Enumerable.Range(0, layer.Height).Reverse()
+						from x in (thisTmxMap.DrawOrderHorizontal == 1) ? Enumerable.Range(0, layer.Width) : Enumerable.Range(0, layer.Width).Reverse()
 
                         let rawTileId = layer.GetRawTileIdAt(x, y)
                         let tileId = TmxMath.GetTileIdWithoutFlags(rawTileId)
@@ -62,14 +65,14 @@ namespace Tiled2Unity
                         let fd = TmxMath.IsTileFlippedDiagonally(rawTileId)
                         let fh = TmxMath.IsTileFlippedHorizontally(rawTileId)
                         let fv = TmxMath.IsTileFlippedVertically(rawTileId)
-                        let animTile = this.tmxMap.Tiles[tileId]
+						let animTile = thisTmxMap.Tiles[tileId]
 
                         // Enumerate through all frames of a tile. (Tiles without animation are treated as a single frame)
-                        from frame in TileFrame.EnumerateFramesFromTile(animTile, this.tmxMap)
+						from frame in TileFrame.EnumerateFramesFromTile(animTile, thisTmxMap)
                         select new
                         {
                             LayerName = layer.Name,
-                            Vertices = CalculateFaceVertices(this.tmxMap.GetMapPositionAt(x, y), frame.Tile.TileSize, this.tmxMap.TileHeight, frame.Position_z),
+							Vertices = CalculateFaceVertices(thisTmxMap.GetMapPositionAt(x, y), frame.Tile.TileSize, thisTmxMap.TileHeight, frame.Position_z),
                             TextureCoordinates = CalculateFaceTextureCoordinates(frame.Tile, fd, fh, fv),
                             ImagePath = frame.Tile.TmxImage.Path,
                             ImageName = Path.GetFileNameWithoutExtension(frame.Tile.TmxImage.Path),
