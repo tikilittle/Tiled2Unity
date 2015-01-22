@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tiled2Unity", "Tiled2Unity.csproj", "{5100C1BE-DF46-447A-8D7F-0376CABC85B1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+		Shipping-WithInstaller|x86 = Shipping-WithInstaller|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Debug|x86.ActiveCfg = Debug|x86
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Debug|x86.Build.0 = Debug|x86
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Release|x86.ActiveCfg = Release|x86
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Release|x86.Build.0 = Release|x86
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Shipping-WithInstaller|x86.ActiveCfg = Shipping-WithInstaller|x86
+		{5100C1BE-DF46-447A-8D7F-0376CABC85B1}.Shipping-WithInstaller|x86.Build.0 = Shipping-WithInstaller|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Tiled2Unity.csproj
+	EndGlobalSection
+EndGlobal
