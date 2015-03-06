@@ -6,7 +6,7 @@ Intended to addapt the source so it would compile fine on linux
 
 Changes:
 =========
-1. Removed Shell32 COM reference from Ookii.Dialogs project
+1. Removed Shell32 COM reference from Ookii.Dialogs project since COM interops are not available on linux
 2. Removed all Shell32 references inside VistaFolderBrowserDialogEvents.cs
 3. Added "PresentationCore.dll" and "System.Deployment.dll" since those are not available on mono.
 4. Turned the "Export to" textBox not read only, since the "Choose Export Folder" does not work well on linux.
