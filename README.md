@@ -4,7 +4,7 @@ https://github.com/Seanba/Tiled2Unity
 
 Intended to addapt the source so it would compile fine on linux
 
-Changes:
+Changes From the Original:
 =========
 1. Removed Shell32 COM reference from Ookii.Dialogs project since COM interops are not available on linux
 2. Removed all Shell32 references inside VistaFolderBrowserDialogEvents.cs
