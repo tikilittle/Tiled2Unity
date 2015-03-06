@@ -17,7 +17,7 @@ namespace Tiled2Unity
         // By the time this is called, our assets should be ready to create the map prefab
         public void MeshImported(string objPath)
         {
-            string xmlPath = ImportUtils.GetXmlPath(objPath);
+            string xmlPath = ImportUtils.GetXmlPathFromFile(objPath);
             XDocument doc = XDocument.Load(xmlPath);
             foreach (var xmlPrefab in doc.Root.Elements("Prefab"))
             {
@@ -49,7 +49,7 @@ namespace Tiled2Unity
             tempPrefab.transform.localScale = new Vector3(prefabScale, prefabScale, prefabScale);
 
             // Part 4: Save the prefab, keeping references intact.
-            string prefabPath = ImportUtils.GetPrefabPath(prefabName);
+            string prefabPath = ImportUtils.GetPrefabPathFromName(prefabName);
             UnityEngine.Object finalPrefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 
             if (finalPrefab == null)
@@ -93,9 +93,18 @@ namespace Tiled2Unity
                     child.name = name;
                 }
 
+                // Set the position
                 float x = ImportUtils.GetAttributeAsFloat(goXml, "x", 0);
                 float y = ImportUtils.GetAttributeAsFloat(goXml, "y", 0);
                 child.transform.position = new Vector3(x, y, 0);
+
+                // Set the rotation
+                float r = ImportUtils.GetAttributeAsFloat(goXml, "rotation", 0);
+                if (r != 0)
+                {
+                    // Use negative 'r' because of change in coordinate systems between Tiled and Unity
+                    child.transform.eulerAngles = new Vector3(0, 0, -r);
+                }
 
                 // Assign the child to the parent
                 child.transform.parent = parent.transform;
@@ -204,7 +213,7 @@ namespace Tiled2Unity
                 float width = ImportUtils.GetAttributeAsFloat(xmlBoxCollider2D, "width");
                 float height = ImportUtils.GetAttributeAsFloat(xmlBoxCollider2D, "height");
                 collider.size = new Vector2(width, height);
-                collider.center = new Vector2(width * 0.5f, -height * 0.5f);
+                collider.offset = new Vector2(width * 0.5f, -height * 0.5f);
             }
 
             // Circle colliders
@@ -214,7 +223,7 @@ namespace Tiled2Unity
                 collider.isTrigger = isTrigger;
                 float radius = ImportUtils.GetAttributeAsFloat(xmlCircleCollider2D, "radius");
                 collider.radius = radius;
-                collider.center = new Vector2(radius, -radius);
+                collider.offset = new Vector2(radius, -radius);
             }
 
             // Edge colliders
@@ -310,6 +319,7 @@ namespace Tiled2Unity
                 map.NumTilesHigh = ImportUtils.GetAttributeAsInt(goXml, "numTilesHigh");
                 map.TileWidth = ImportUtils.GetAttributeAsInt(goXml, "tileWidth");
                 map.TileHeight = ImportUtils.GetAttributeAsInt(goXml, "tileHeight");
+                map.ExportScale = ImportUtils.GetAttributeAsFloat(goXml, "exportScale");
             }
             catch
             {
