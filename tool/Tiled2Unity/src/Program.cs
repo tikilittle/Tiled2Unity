@@ -26,7 +26,11 @@ namespace Tiled2Unity
         public delegate void WriteVerboseDelegate(string line);
         public static event WriteVerboseDelegate OnWriteVerbose;
 
+        static private readonly float DefaultTexelBias = 8192.0f;
+
         static public bool AutoExport { get; private set; }
+        static public float Scale { get; set; }
+        static public float TexelBias { get; private set; }
         static public bool Verbose { get; private set; }
         static public bool Help { get; private set; }
 
@@ -37,9 +41,11 @@ namespace Tiled2Unity
 
         static private NDesk.Options.OptionSet Options = new NDesk.Options.OptionSet()
             {
-                { "a|auto-export", "Automatically export to UNITYDIR and close", ae => Program.AutoExport = true },
-                { "v|verbose", "Print verbose messages", v => Program.Verbose = true },
-                { "h|help", "Display this help message", h => Program.Help = true },
+                { "a|auto-export", "Automatically export to UNITYDIR and close.", ae => Program.AutoExport = true },
+                { "s|scale=", "Scale the output vertices by a value.\nA value of 0.01 is popular for many Unity projects that use 'Pixels Per Unit' of 100 for sprites.\nDefault is 1 (no scaling).", s => Program.Scale = ParseFloatDefault(s, 1.0f) },
+                { "t|texel-bias=", "Bias for texel sampling.\nTexels are offset by 1 / value.\nDefault value is 8192.\nA value of 2048 has been useful for shaders that show seams.", t => Program.TexelBias = ParseFloatDefault(t, DefaultTexelBias) },
+                { "v|verbose", "Print verbose messages.", v => Program.Verbose = true },
+                { "h|help", "Display this help message.", h => Program.Help = true },
             };
 
         /// <summary>
@@ -57,6 +63,8 @@ namespace Tiled2Unity
 
             // Default options
             Program.AutoExport = false;
+            Program.Scale = -1.0f;
+            Program.TexelBias = DefaultTexelBias;
             Program.Verbose = false;
             Program.Help = false;
             Program.TmxPath = "";
@@ -76,6 +84,25 @@ namespace Tiled2Unity
         {
             // Parse the options
             List<string> extra = Program.Options.Parse(args);
+
+            // If we didn''t overide scale then use the old value
+            if (Program.Scale <= 0.0f)
+            {
+                if (Properties.Settings.Default.LastVertexScale > 0)
+                {
+                    Program.Scale = Properties.Settings.Default.LastVertexScale;
+                }
+                else
+                {
+                    Program.Scale = 1.0f;
+                }
+            }
+            else
+            {
+                // Save our new value
+                Properties.Settings.Default.LastVertexScale = Program.Scale;
+                Properties.Settings.Default.Save();
+            }
 
             // First left over option must exist and it is the TMX file we are exporting
             if (extra.Count() == 0)
@@ -149,7 +176,7 @@ namespace Tiled2Unity
         {
             Program.WriteLine("Tiled2Unity Utility, Version: {0}", GetVersion());
             Program.WriteLine("Usage: Tiled2Unity [OPTIONS]+ TMXPATH [UNITYDIR]");
-            Program.WriteLine("Example: Tiled2Unity --verbose MyTiledMap.tmx ../../MyUnityProjectFolder");
+            Program.WriteLine("Example: Tiled2Unity --verbose -s=0.01 MyTiledMap.tmx ../../MyUnityProjectFolder");
             Program.WriteLine("");
             Program.WriteLine("Options:");
 
@@ -165,12 +192,8 @@ namespace Tiled2Unity
             Program.WriteLine("  unity:scale");
             Program.WriteLine("  unity:isTrigger");
             Program.WriteLine("  unity:ignore");
+            Program.WriteLine("  unity:collisionOnly");
             Program.WriteLine("  (Other properties are exported for custom scripting in your Unity project)");
-
-            Program.WriteLine();
-            Program.WriteLine("Tiled2Unity requires a version of Tiled Map Editor that has the Tile Collision Editor feature.");
-            Program.WriteLine("This is currently available through a daily build at http://files.mapeditor.org/daily/");
-            Program.WriteLine("(Tiled2Unity has been tested with the 2014-05-23 build of Tiled Map Editor)");
         }
 
         public static void WriteLine()
@@ -311,6 +334,16 @@ namespace Tiled2Unity
             }
 
             return false;
+        }
+
+        static private float ParseFloatDefault(string str, float defaultValue)
+        {
+            float resultValue = 0;
+            if (float.TryParse(str, out resultValue))
+            {
+                return resultValue;
+            }
+            return defaultValue;
         }
 
     } // end class

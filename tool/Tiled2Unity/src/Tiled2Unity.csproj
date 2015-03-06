@@ -29,13 +29,14 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <StartupObject>Tiled2Unity.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -45,7 +46,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -55,7 +56,7 @@
     <ApplicationIcon>t2u-icon-bw.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Shipping-WithInstaller|x86'">
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\x86\Shipping-WithInstaller\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -73,20 +74,29 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment">
-      <HintPath>..\System.Deployment.dll</HintPath>
-    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Deployment">
+      <HintPath>..\libs\System.Deployment.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore">
-      <HintPath>..\PresentationCore.dll</HintPath>
+      <HintPath>..\libs\PresentationCore.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChDir.cs" />
+    <Compile Include="DataGridViewButtonCell_ColorPicker.cs" />
+    <Compile Include="DataGridViewColumn_ColorPicker.cs" />
     <Compile Include="LayerClipper.cs" />
+    <Compile Include="PerLayerColorData.cs" />
     <Compile Include="PolylineReduction.cs" />
+    <Compile Include="PreviewPreferencesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PreviewPreferencesForm.Designer.cs">
+      <DependentUpon>PreviewPreferencesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ThirdParty\Algorithmia\MultiValueDictionary.cs" />
     <Compile Include="ThirdParty\Clipper\clipper.cs" />
     <Compile Include="ThirdParty\NDesk\Options.cs" />
@@ -143,6 +153,9 @@
     <Compile Include="TmxProperties.Xml.cs" />
     <Compile Include="TmxTile.cs" />
     <Compile Include="TmxTile.Xml.cs" />
+    <EmbeddedResource Include="PreviewPreferencesForm.resx">
+      <DependentUpon>PreviewPreferencesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -219,6 +232,10 @@
   </Target>
   -->
   <ItemGroup>
+    <ProjectReference Include="ThirdParty\ThemeColorPicker\ThemeColorPicker.csproj">
+      <Project>{A4D1EDB0-61E7-4943-AA8D-E545456BC392}</Project>
+      <Name>ThemeColorPicker</Name>
+    </ProjectReference>
     <ProjectReference Include="ThirdParty\Ookii.Dialogs.Modified\src\Ookii.Dialogs\Ookii.Dialogs.csproj">
       <Project>{779E62B3-C5A6-494D-9D87-96C0DEC7FFB0}</Project>
       <Name>Ookii.Dialogs</Name>

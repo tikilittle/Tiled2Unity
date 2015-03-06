@@ -61,72 +61,90 @@ namespace Tiled2Unity
             exportDir = Path.Combine(exportDir, "Tiled2Unity");
             exportDir = Path.Combine(exportDir, "Imported");
 
-//            if (!Directory.Exists(exportDir))
-//            {
-//                StringBuilder builder = new StringBuilder();
-//                builder.AppendFormat("Could not export '{0}'\n", fileToSave);
-//                builder.AppendFormat("Tiled2Unity.unitypackage is not installed in unity project: {0}\n", exportToUnityProjectPath);
-//                builder.AppendFormat("Select \"Help -> Import Unity Package to Project\" and re-export");
-//                Program.WriteError(builder.ToString());
-//                return;
-//            }
+            if (!Directory.Exists(exportDir))
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.AppendFormat("Could not export '{0}'\n", fileToSave);
+                builder.AppendFormat("Tiled2Unity.unitypackage is not installed in unity project: {0}\n", exportToUnityProjectPath);
+                builder.AppendFormat("Select \"Help -> Import Unity Package to Project\" and re-export");
+                Program.WriteError(builder.ToString());
+                return;
+            }
 
             // Detect which version of Tiled2Unity is in our project
             // ...\unity-project\Assets\Tiled2Unity\Scripts\Editor\ImportTiled2Unity.Xml.cs
-//            string unityProjectVersionCS = Path.Combine(exportToUnityProjectPath, "Assets", "Tiled2Unity", "Scripts", "Editor", "ImportTiled2Unity.Xml.cs");
-//            if (!File.Exists(unityProjectVersionCS))
-//            {
-//                StringBuilder builder = new StringBuilder();
-//                builder.AppendFormat("Could not export '{0}'\n", fileToSave);
-//                builder.AppendFormat("Tiled2Unity.unitypackage is not properly installed in unity project: {0}\n", exportToUnityProjectPath);
-//                builder.AppendFormat("Missing file: {0}\n", unityProjectVersionCS);
-//                builder.AppendFormat("Select \"Help -> Import Unity Package to Project\" and re-export");
-//                Program.WriteError(builder.ToString());
-//                return;
-//            }
+            string unityProjectVersionCS = Path.Combine(exportToUnityProjectPath, "Assets", "Tiled2Unity", "Scripts", "Editor", "ImportTiled2Unity.Xml.cs");
+            if (!File.Exists(unityProjectVersionCS))
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.AppendFormat("Could not export '{0}'\n", fileToSave);
+                builder.AppendFormat("Tiled2Unity.unitypackage is not properly installed in unity project: {0}\n", exportToUnityProjectPath);
+                builder.AppendFormat("Missing file: {0}\n", unityProjectVersionCS);
+                builder.AppendFormat("Select \"Help -> Import Unity Package to Project\" and re-export");
+                Program.WriteError(builder.ToString());
+                return;
+            }
 
             // Open the unity-side script file and check its version number
-//            string csText = File.ReadAllText(unityProjectVersionCS);
-//            if (!String.IsNullOrEmpty(csText))
-//            {
-//                string pattern = "string ThisVersion = \"(?<version>.*)?\";";
-//                Regex regex = new Regex(pattern);
-//                Match match = regex.Match(csText);
-//                Group group = match.Groups["version"];
-//                if (group.Success)
-//                {
-//                    if (Program.GetVersion() != group.ToString())
-//                    {
-//                        StringBuilder builder = new StringBuilder();
-//                        builder.AppendFormat("Warning exporting '{0}'\n", fileToSave);
-//                        builder.AppendFormat("Version mismatch\n");
-//                        builder.AppendFormat("  Tiled2Unity version: {0}\n", Program.GetVersion());
-//                        builder.AppendFormat("  Project version    : {0}\n", group.ToString());
-//                        Program.WriteWarning(builder.ToString());
-//                    }
-//                }
-//            }
+            string csText = File.ReadAllText(unityProjectVersionCS);
+            if (!String.IsNullOrEmpty(csText))
+            {
+                string pattern = "string ThisVersion = \"(?<version>.*)?\";";
+                Regex regex = new Regex(pattern);
+                Match match = regex.Match(csText);
+                Group group = match.Groups["version"];
+                if (group.Success)
+                {
+                    if (Program.GetVersion() != group.ToString())
+                    {
+                        StringBuilder builder = new StringBuilder();
+                        builder.AppendFormat("Warning exporting '{0}'\n", fileToSave);
+                        builder.AppendFormat("Version mismatch\n");
+                        builder.AppendFormat("  Tiled2Unity version: {0}\n", Program.GetVersion());
+                        builder.AppendFormat("  Project version    : {0}\n", group.ToString());
+                        Program.WriteWarning(builder.ToString());
+                    }
+                }
+            }
 
 
             // Save the file (which is importing it into Unity)
             string pathToSave = Path.Combine(exportDir, fileToSave);
             Program.WriteLine("Exporting to: {0}", pathToSave);
             doc.Save(pathToSave);
-            Program.WriteSuccess("Succesfully exported: {0}", pathToSave);
+            Program.WriteSuccess("Succesfully exported: {0}\n  vertex scale = {1}", pathToSave, Program.Scale);
         }
 
-        public static Vector3D PointFToUnityVector(PointF pt)
+        public static Tiled2Unity.Vector3D PointFToUnityVector_NoScale(PointF pt)
         {
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Have to watch for negative zero, ffs
-            return new Vector3D(pt.X, pt.Y == 0 ? 0 : -pt.Y, 0.0f);
+            return new Tiled2Unity.Vector3D(pt.X, pt.Y == 0 ? 0 : -pt.Y, 0.0f);
         }
 
-        public static Vector3D PointToObjVertex(Point pt, float pos_z)
+        public static Tiled2Unity.Vector3D PointFToUnityVector(PointF pt)
+        {
+            // Unity's coordinate sytem has y-up positive, y-down negative
+            // Apply scaling
+            PointF scaled = pt;
+            scaled.X *= Program.Scale;
+            scaled.Y *= Program.Scale;
+
+            // Have to watch for negative zero, ffs
+            return new Tiled2Unity.Vector3D(scaled.X, scaled.Y == 0 ? 0 : -scaled.Y, 0.0f);
+        }
+
+        public static Tiled2Unity.Vector3D PointFToObjVertex(PointF pt, float pos_z)
         {
             // Note, we negate the x and y due to Wavefront's coordinate system
+            // Applying scaling
+            PointF scaled = pt;
+            scaled.X *= Program.Scale;
+            scaled.Y *= Program.Scale;
+            float scaled_z = pos_z *= Program.Scale;
+
             // Watch for negative zero, ffs
-            return new Vector3D(pt.X == 0 ? 0 : -pt.X, pt.Y == 0 ? 0 : -pt.Y, pos_z);
+            return new Vector3D(scaled.X == 0 ? 0 : -scaled.X, scaled.Y == 0 ? 0 : -scaled.Y, scaled_z);
         }
 
         public static PointF PointToTextureCoordinate(PointF pt, Size imageSize)

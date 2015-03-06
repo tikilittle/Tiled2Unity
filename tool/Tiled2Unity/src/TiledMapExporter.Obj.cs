@@ -43,21 +43,19 @@ namespace Tiled2Unity
             }
         }
 
-		public static TmxMap thisTmxMap;
-
         private StringWriter BuildObjString()
         {
             // Creates the text for a Wavefront OBJ file for the TmxMap
             StringWriter objWriter = new StringWriter();
 
             // Gather the information for every face
-			thisTmxMap = this.tmxMap;
-			var faces = from layer in thisTmxMap.Layers
+            var faces = from layer in this.tmxMap.Layers
                         where layer.Visible == true
+                        where layer.Properties.GetPropertyValueAsBoolean("unity:collisionOnly", false) == false
 
                         // Draw order forces us to visit tiles in a particular order
-						from y in (thisTmxMap.DrawOrderVertical == 1) ? Enumerable.Range(0, layer.Height) : Enumerable.Range(0, layer.Height).Reverse()
-						from x in (thisTmxMap.DrawOrderHorizontal == 1) ? Enumerable.Range(0, layer.Width) : Enumerable.Range(0, layer.Width).Reverse()
+                        from y in (this.tmxMap.DrawOrderVertical == 1) ? Enumerable.Range(0, layer.Height) : Enumerable.Range(0, layer.Height).Reverse()
+                        from x in (this.tmxMap.DrawOrderHorizontal == 1) ? Enumerable.Range(0, layer.Width) : Enumerable.Range(0, layer.Width).Reverse()
 
                         let rawTileId = layer.GetRawTileIdAt(x, y)
                         let tileId = TmxMath.GetTileIdWithoutFlags(rawTileId)
@@ -65,14 +63,14 @@ namespace Tiled2Unity
                         let fd = TmxMath.IsTileFlippedDiagonally(rawTileId)
                         let fh = TmxMath.IsTileFlippedHorizontally(rawTileId)
                         let fv = TmxMath.IsTileFlippedVertically(rawTileId)
-						let animTile = thisTmxMap.Tiles[tileId]
+                        let animTile = this.tmxMap.Tiles[tileId]
 
                         // Enumerate through all frames of a tile. (Tiles without animation are treated as a single frame)
-						from frame in TileFrame.EnumerateFramesFromTile(animTile, thisTmxMap)
+                        from frame in TileFrame.EnumerateFramesFromTile(animTile, this.tmxMap)
                         select new
                         {
-                            LayerName = layer.Name,
-							Vertices = CalculateFaceVertices(thisTmxMap.GetMapPositionAt(x, y), frame.Tile.TileSize, thisTmxMap.TileHeight, frame.Position_z),
+                            LayerName = layer.UniqueName,
+                            Vertices = CalculateFaceVertices(this.tmxMap.GetMapPositionAt(x, y), frame.Tile.TileSize, this.tmxMap.TileHeight, frame.Position_z),
                             TextureCoordinates = CalculateFaceTextureCoordinates(frame.Tile, fd, fh, fv),
                             ImagePath = frame.Tile.TmxImage.Path,
                             ImageName = Path.GetFileNameWithoutExtension(frame.Tile.TmxImage.Path),
@@ -171,17 +169,17 @@ namespace Tiled2Unity
             // Location on map is complicated by tiles that are 'higher' than the tile size given for the overall map
             mapLocation.Offset(0, -tileSize.Height + mapTileHeight);
 
-            Point pt0 = mapLocation;
-            Point pt1 = Point.Add(mapLocation, new Size(tileSize.Width, 0));
-            Point pt2 = Point.Add(mapLocation, tileSize);
-            Point pt3 = Point.Add(mapLocation, new Size(0, tileSize.Height));
+            PointF pt0 = mapLocation;
+            PointF pt1 = PointF.Add(mapLocation, new Size(tileSize.Width, 0));
+            PointF pt2 = PointF.Add(mapLocation, tileSize);
+            PointF pt3 = PointF.Add(mapLocation, new Size(0, tileSize.Height));
 
             // We need to use ccw winding for Wavefront objects
             Vector3D[] vertices  = new Vector3D[4];
-            vertices[3] = PointToObjVertex(pt0, pos_z);
-            vertices[2] = PointToObjVertex(pt1, pos_z);
-            vertices[1] = PointToObjVertex(pt2, pos_z);
-            vertices[0] = PointToObjVertex(pt3, pos_z);
+            vertices[3] = PointFToObjVertex(pt0, pos_z);
+            vertices[2] = PointFToObjVertex(pt1, pos_z);
+            vertices[1] = PointFToObjVertex(pt2, pos_z);
+            vertices[0] = PointFToObjVertex(pt3, pos_z);
             return vertices;
         }
 
@@ -213,7 +211,10 @@ namespace Tiled2Unity
             // This keeps us from seeing seams
             // (If seams continue along "outer" edges we can try applying the bias there as well)
             // Note: On Oct 25, a user was having issues with outer edges, so I brought those in as well afterall (for version 0.9.5.4)
-            const float bias = 1.0f / 8192.0f;
+            //const float bias = 1.0f / 8192.0f;
+            //const float bias = 1.0f / 4096.0f;
+            //const float bias = 1.0f / 2048.0f;
+            float bias = 1.0f / Program.TexelBias;
             coordinates[0].X += bias;
             coordinates[0].Y += bias;
 

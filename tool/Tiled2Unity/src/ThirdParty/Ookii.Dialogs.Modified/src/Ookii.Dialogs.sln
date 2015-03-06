@@ -22,14 +22,11 @@ Global
 		{D52F3B1C-03B3-41B1-A15E-E23FF6877939}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D52F3B1C-03B3-41B1-A15E-E23FF6877939}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{779E62B3-C5A6-494D-9D87-96C0DEC7FFB0} = {68ED7CF2-8E33-460B-AF18-15143BF954F6}
 		{D52F3B1C-03B3-41B1-A15E-E23FF6877939} = {68ED7CF2-8E33-460B-AF18-15143BF954F6}
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Ookii.Dialogs\Ookii.Dialogs.csproj
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

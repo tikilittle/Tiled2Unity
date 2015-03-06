@@ -1,18 +1,11 @@
-﻿<Properties>
+﻿<Properties GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Tiled2Unity" expanded="True">
-            <Node name="References" expanded="True" />
-            <Node name="Tiled2UnityForm.cs" expanded="True" />
-            <Node name="TmxObjectGroup.cs" selected="True" />
-          </Node>
+        <State expanded="True" selected="True">
+          <Node name="Tiled2Unity" expanded="True" />
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

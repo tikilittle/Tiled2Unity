@@ -63,6 +63,7 @@ namespace Tiled2Unity
             prefab.SetAttributeValue("numTilesHigh", this.tmxMap.Height);
             prefab.SetAttributeValue("tileWidth", this.tmxMap.TileWidth);
             prefab.SetAttributeValue("tileHeight", this.tmxMap.TileHeight);
+            prefab.SetAttributeValue("exportScale", Program.Scale);
             AssignUnityProperties(this.tmxMap, prefab, PrefabContext.Root);
             AssignTiledProperties(this.tmxMap, prefab);
 
@@ -74,17 +75,20 @@ namespace Tiled2Unity
                     if (layer.Visible == false)
                         continue;
 
-                    // Submeshes for the layer (layer+material)
-                    var meshElements = CreateMeshElementsForLayer(layer);
+                    XElement layerElement =
+                        new XElement("GameObject",
+                            new XAttribute("name", layer.UniqueName));
+
+                    if (layer.Properties.GetPropertyValueAsBoolean("unity:collisionOnly", false) == false)
+                    {
+                        // Submeshes for the layer (layer+material)
+                        var meshElements = CreateMeshElementsForLayer(layer);
+                        layerElement.Add(meshElements);
+                    }
 
                     // Collision data for the layer
                     var collisionElements = CreateCollisionElementForLayer(layer);
-
-                    XElement layerElement =
-                        new XElement("GameObject",
-                            new XAttribute("name", layer.Name),
-                            meshElements,
-                            collisionElements);
+                    layerElement.Add(collisionElements);
 
                     AssignUnityProperties(layer, layerElement, PrefabContext.TiledLayer);
                     AssignTiledProperties(layer, layerElement);
@@ -139,6 +143,7 @@ namespace Tiled2Unity
                 Vector3D pos = PointFToUnityVector(tmxObject.Position);
                 xmlObject.SetAttributeValue("x", pos.X);
                 xmlObject.SetAttributeValue("y", pos.Y);
+                xmlObject.SetAttributeValue("rotation", tmxObject.Rotation);
 
                 AssignUnityProperties(tmxObject, xmlObject, PrefabContext.Object);
                 AssignTiledProperties(tmxObject, xmlObject);
@@ -163,7 +168,7 @@ namespace Tiled2Unity
                 }
                 else if (tmxObject.GetType() == typeof(TmxObjectTile))
                 {
-                    AssignTileObjectProperites(tmxObject as TmxObjectTile, xmlObject);
+                    AddTileObjectElements(tmxObject as TmxObjectTile, xmlObject);
                 }
                 else
                 {
@@ -192,7 +197,7 @@ namespace Tiled2Unity
                          where rawTileId != 0
                          let tileId = TmxMath.GetTileIdWithoutFlags(rawTileId)
                          let tile = this.tmxMap.Tiles[tileId]
-                         let name = TiledMapExpoterUtils.UnityFriendlyMeshName(tmxMap, layer.Name, Path.GetFileNameWithoutExtension(tile.TmxImage.Path))
+                         let name = TiledMapExpoterUtils.UnityFriendlyMeshName(tmxMap, layer.UniqueName, Path.GetFileNameWithoutExtension(tile.TmxImage.Path))
                          group tile.Animation by name into meshGroup
                          select meshGroup;
 
@@ -280,6 +285,7 @@ namespace Tiled2Unity
             knownProperties.Add("unity:scale");
             knownProperties.Add("unity:isTrigger");
             knownProperties.Add("unity:ignore");
+            knownProperties.Add("unity:collisionOnly");
 
             var unknown = from p in tmx.Properties.PropertyMap
                           where p.Key.StartsWith("unity:")
@@ -324,8 +330,8 @@ namespace Tiled2Unity
         {
             XElement xmlCollider =
                 new XElement("BoxCollider2D",
-                    new XAttribute("width", tmxRectangle.Size.Width),
-                    new XAttribute("height", tmxRectangle.Size.Height));
+                    new XAttribute("width", tmxRectangle.Size.Width * Program.Scale),
+                    new XAttribute("height", tmxRectangle.Size.Height * Program.Scale));
 
             return xmlCollider;
         }
@@ -342,7 +348,7 @@ namespace Tiled2Unity
             {
                 XElement circleCollider =
                     new XElement("CircleCollider2D",
-                        new XAttribute("radius", tmxEllipse.Radius));
+                        new XAttribute("radius", tmxEllipse.Radius * Program.Scale));
 
                 return circleCollider;
             }
@@ -374,10 +380,46 @@ namespace Tiled2Unity
             return edgeCollider;
         }
 
-        private void AssignTileObjectProperites(TmxObjectTile tmxTile, XElement xmlObject)
+        private void AddTileObjectElements(TmxObjectTile tmxTile, XElement xmlTileObject)
         {
             // We combine the properties of the tile that is referenced and add it to our own properties
-            AssignTiledProperties(tmxTile.Tile, xmlObject);
+            AssignTiledProperties(tmxTile.Tile, xmlTileObject);
+
+            // Add any colliders that might be on the tile
+            foreach (TmxObject tmxObject in tmxTile.Tile.ObjectGroup.Objects)
+            {
+                // All the objects/colliders in our object group need to be separate game objects because they can have unique tags/layers
+                XElement xmlObject = new XElement("GameObject", new XAttribute("name", tmxObject.GetNonEmptyName()));
+
+                Vector3D pos = PointFToUnityVector(tmxObject.Position);
+                xmlObject.SetAttributeValue("x", pos.X);
+                xmlObject.SetAttributeValue("y", pos.Y);
+                xmlObject.SetAttributeValue("rotation", tmxObject.Rotation);
+
+                XElement objElement = null;
+
+                if (tmxObject.GetType() == typeof(TmxObjectRectangle))
+                {
+                    objElement = CreateBoxColliderElement(tmxObject as TmxObjectRectangle);
+                }
+                else if (tmxObject.GetType() == typeof(TmxObjectEllipse))
+                {
+                    objElement = CreateCircleColliderElement(tmxObject as TmxObjectEllipse, tmxTile.Tile.ObjectGroup.Name);
+                }
+                else if (tmxObject.GetType() == typeof(TmxObjectPolygon))
+                {
+                    objElement = CreatePolygonColliderElement(tmxObject as TmxObjectPolygon);
+                }
+                else if (tmxObject.GetType() == typeof(TmxObjectPolyline))
+                {
+                    objElement = CreateEdgeColliderElement(tmxObject as TmxObjectPolyline);
+                }
+
+                if (objElement != null)
+                {
+                    xmlTileObject.Add(objElement);
+                }
+            }
         }
 
 

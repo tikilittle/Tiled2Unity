@@ -67,6 +67,10 @@ namespace Tiled2Unity
                     Properties.Settings.Default.Save();
                 }
 
+                // Set the vertex scale
+                this.textBoxScale.Text = Program.Scale.ToString();
+
+                // Open the TMX file
                 OpenTmxFile(Program.TmxPath);
 
                 if (Program.AutoExport)
@@ -74,6 +78,14 @@ namespace Tiled2Unity
                     Program.WriteLine("Automatically exporting: {0}", Program.ExportUnityProjectDir);
                     this.tmxExporter.Export(Program.ExportUnityProjectDir);
                     Close();
+                }
+            }
+            else
+            {
+                // Repeat any errors
+                foreach (string error in this.errors)
+                {
+                    WriteText(error, Color.Red);
                 }
             }
         }
@@ -85,7 +97,7 @@ namespace Tiled2Unity
 
             this.buttonFolderBrowser.Enabled = false;
             this.buttonViewer.Enabled = false;
-            //this.buttonExport.Enabled = false;
+            this.buttonExport.Enabled = false;
 
             try
             {
@@ -117,8 +129,7 @@ namespace Tiled2Unity
                 exportPathExists = true;
             }
 
-            //this.buttonExport.Enabled = (this.tmxExporter != null) && exportPathExists;
-			this.buttonExport.Enabled = true;
+            this.buttonExport.Enabled = (this.tmxExporter != null) && exportPathExists;
         }
 
         private void ReportSummary()
@@ -149,7 +160,7 @@ namespace Tiled2Unity
 
         void Program_OnWriteLine(string line)
         {
-            //WriteText(line);
+            WriteText(line);
         }
 
         void Program_OnWriteWarning(string warning)
@@ -180,10 +191,10 @@ namespace Tiled2Unity
         }
 
         // Interop and Win32 API tricks to get text box selection to work like VisualStudio Output window
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
-        const int WM_USER = 0x400;
-        const int EM_HIDESELECTION = WM_USER + 63;
+        //[System.Runtime.InteropServices.DllImport("user32.dll")]
+        //static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
+        //const int WM_USER = 0x400;
+        //const int EM_HIDESELECTION = WM_USER + 63;
 
         private void WriteText(string line, Color color)
         {
@@ -236,11 +247,8 @@ namespace Tiled2Unity
 
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-				System.Console.WriteLine(dlg.SelectedPath);
-				System.Console.WriteLine(Path.GetFullPath(dlg.SelectedPath));
                 Properties.Settings.Default.LastExportDirectory = Path.GetFullPath(dlg.SelectedPath);
                 Properties.Settings.Default.Save();
-				System.Console.WriteLine(Properties.Settings.Default.LastExportDirectory);
             }
         }
 
@@ -333,10 +341,39 @@ namespace Tiled2Unity
 
         private void addUnityPackageToProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string folder = Path.GetDirectoryName(path);
-            string package = Path.Combine(folder, "Tiled2Unity.unitypackage");
-            System.Diagnostics.Process.Start(package);
+			if (Type.GetType ("Mono.Runtime") == null) {// if running on windows
+				string path = System.Reflection.Assembly.GetExecutingAssembly ().Location;
+				string folder = Path.GetDirectoryName (path);
+				string package = Path.Combine (folder, "Tiled2Unity.unitypackage");
+				System.Diagnostics.Process.Start (package);
+			}//else, there is no way yet to determine how to install the package
+        }
+
+        private void textBoxScale_Validating(object sender, CancelEventArgs e)
+        {
+            bool good = false;
+
+            float scale = Program.Scale;
+            if (Single.TryParse(this.textBoxScale.Text, out scale))
+            {
+                // Is the scale greater than 0?
+                if (scale > 0)
+                {
+                    good = true;
+                }
+            }
+
+            if (good)
+            {
+                Program.Scale = scale;
+                Properties.Settings.Default.LastVertexScale = Program.Scale;
+                Properties.Settings.Default.Save();
+            }
+            else
+            {
+                // Set to 1.0
+                this.textBoxScale.Text = "1.0";
+            }
         }
 
     }
