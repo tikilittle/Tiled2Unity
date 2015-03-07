@@ -117,6 +117,12 @@ namespace Tiled2Unity
             this.buttonFolderBrowser.Enabled = true;
             this.buttonViewer.Enabled = true;
             CheckExportButton();
+			string exportDir = global::Tiled2Unity.Properties.Settings.Default.LastExportDirectory;
+			if (Program.Cli && Directory.Exists(exportDir)) {
+				this.tmxExporter = new TiledMapExporter(tmxMap);
+				this.tmxExporter.Export(exportDir);
+				Application.Exit ();
+			}
         }
 
         void CheckExportButton()
