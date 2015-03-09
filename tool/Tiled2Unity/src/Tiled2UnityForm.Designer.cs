@@ -225,11 +225,8 @@
             this.textBoxExportFolder.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Tiled2Unity.Properties.Settings.Default, "LastExportDirectory", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.textBoxExportFolder.Location = new System.Drawing.Point(89, 418);
             this.textBoxExportFolder.Name = "textBoxExportFolder";
-            bool readOnly = true;
-            if (System.Type.GetType ("Mono.Runtime") != null) {// if running under mono
-                readOnly = false;
-            }
-            this.textBoxExportFolder.ReadOnly = readOnly;
+            this.textBoxExportFolder.ReadOnly = true;
+
             this.textBoxExportFolder.Size = new System.Drawing.Size(607, 20);
             this.textBoxExportFolder.TabIndex = 2;
             this.textBoxExportFolder.Text = global::Tiled2Unity.Properties.Settings.Default.LastExportDirectory;

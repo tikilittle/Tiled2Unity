@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Windows.Media.Media3D;
 using System.Xml;
 using System.Xml.Linq;
+using Vector3D = Tiled2Unity.Vector3D;
 
 namespace Tiled2Unity
 {
@@ -115,14 +116,14 @@ namespace Tiled2Unity
             Program.WriteSuccess("Succesfully exported: {0}\n  vertex scale = {1}", pathToSave, Program.Scale);
         }
 
-        public static Tiled2Unity.Vector3D PointFToUnityVector_NoScale(PointF pt)
+        public static Vector3D PointFToUnityVector_NoScale(PointF pt)
         {
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Have to watch for negative zero, ffs
-            return new Tiled2Unity.Vector3D(pt.X, pt.Y == 0 ? 0 : -pt.Y, 0.0f);
+            return new Vector3D(pt.X, pt.Y == 0 ? 0 : -pt.Y, 0.0f);
         }
 
-        public static Tiled2Unity.Vector3D PointFToUnityVector(PointF pt)
+        public static Vector3D PointFToUnityVector(PointF pt)
         {
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Apply scaling
@@ -131,10 +132,10 @@ namespace Tiled2Unity
             scaled.Y *= Program.Scale;
 
             // Have to watch for negative zero, ffs
-            return new Tiled2Unity.Vector3D(scaled.X, scaled.Y == 0 ? 0 : -scaled.Y, 0.0f);
+            return new Vector3D(scaled.X, scaled.Y == 0 ? 0 : -scaled.Y, 0.0f);
         }
 
-        public static Tiled2Unity.Vector3D PointFToObjVertex(PointF pt, float pos_z)
+        public static Vector3D PointFToObjVertex(PointF pt, float pos_z)
         {
             // Note, we negate the x and y due to Wavefront's coordinate system
             // Applying scaling

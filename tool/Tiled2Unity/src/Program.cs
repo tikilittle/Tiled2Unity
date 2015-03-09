@@ -48,6 +48,7 @@ namespace Tiled2Unity
                 { "v|verbose", "Print verbose messages.", v => Program.Verbose = true },
                 { "h|help", "Display this help message.", h => Program.Help = true },
 				{ "c|cli", "Runs in the command line only, no gui.", c => Program.Cli = true }
+
             };
 
         /// <summary>

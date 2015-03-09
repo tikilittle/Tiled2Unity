@@ -3,7 +3,12 @@
   <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True" />
+        <State expanded="True">
+          <Node name="Tiled2Unity" expanded="True">
+            <Node name="Program.cs" selected="True" />
+            <Node name="Tiled2UnityForm.cs" expanded="True" />
+          </Node>
+        </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

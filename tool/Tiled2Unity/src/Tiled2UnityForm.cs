@@ -255,6 +255,7 @@ namespace Tiled2Unity
             {
                 Properties.Settings.Default.LastExportDirectory = Path.GetFullPath(dlg.SelectedPath);
                 Properties.Settings.Default.Save();
+                this.textBoxExportFolder.Text = Properties.Settings.Default.LastExportDirectory;
             }
         }
 
@@ -381,7 +382,6 @@ namespace Tiled2Unity
                 this.textBoxScale.Text = "1.0";
             }
         }
-
     }
 }
 
