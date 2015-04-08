@@ -80,12 +80,12 @@ namespace Ookii.Dialogs
             string directory = Path.GetDirectoryName(path);
             string file = Path.GetFileName(path);
 
-//            Shell32.Shell shell = new Shell32.Shell();
-//            Shell32.Folder folder = shell.NameSpace(directory);
-//            Shell32.FolderItem folderItem = folder.ParseName(file);
-//
-//            if (folderItem != null)
-//                return folderItem.IsLink;
+            Shell32.Shell shell = new Shell32.Shell();
+            Shell32.Folder folder = shell.NameSpace(directory);
+            Shell32.FolderItem folderItem = folder.ParseName(file);
+
+            if (folderItem != null)
+                return folderItem.IsLink;
             return false;
         }
 
@@ -94,13 +94,12 @@ namespace Ookii.Dialogs
             string directory = Path.GetDirectoryName(path);
             string file = Path.GetFileName(path);
 
-//            Shell32.Shell shell = new Shell32.Shell();
-//            Shell32.Folder folder = shell.NameSpace(directory);
-//            Shell32.FolderItem folderItem = folder.ParseName(file);
-//
-//            Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)folderItem.GetLink;
-//            return link.Path;
-			return null;
+            Shell32.Shell shell = new Shell32.Shell();
+            Shell32.Folder folder = shell.NameSpace(directory);
+            Shell32.FolderItem folderItem = folder.ParseName(file);
+
+            Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)folderItem.GetLink;
+            return link.Path;
         }
 
         public void OnShareViolation(Interop.IFileDialog pfd, Interop.IShellItem psi, out NativeMethods.FDE_SHAREVIOLATION_RESPONSE pResponse)

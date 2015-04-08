@@ -226,7 +226,6 @@
             this.textBoxExportFolder.Location = new System.Drawing.Point(89, 418);
             this.textBoxExportFolder.Name = "textBoxExportFolder";
             this.textBoxExportFolder.ReadOnly = true;
-
             this.textBoxExportFolder.Size = new System.Drawing.Size(607, 20);
             this.textBoxExportFolder.TabIndex = 2;
             this.textBoxExportFolder.Text = global::Tiled2Unity.Properties.Settings.Default.LastExportDirectory;

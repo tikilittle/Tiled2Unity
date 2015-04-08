@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Windows.Media.Media3D;
 using System.Xml;
 using System.Xml.Linq;
-using Vector3D = Tiled2Unity.Vector3D;
 
 namespace Tiled2Unity
 {

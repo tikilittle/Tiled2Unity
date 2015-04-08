@@ -33,7 +33,6 @@ namespace Tiled2Unity
         static public float TexelBias { get; private set; }
         static public bool Verbose { get; private set; }
         static public bool Help { get; private set; }
-		static public bool Cli { get; private set; }
 
         static public string TmxPath { get; private set; }
         static public string ExportUnityProjectDir { get; private set; }
@@ -47,8 +46,6 @@ namespace Tiled2Unity
                 { "t|texel-bias=", "Bias for texel sampling.\nTexels are offset by 1 / value.\nDefault value is 8192.\nA value of 2048 has been useful for shaders that show seams.", t => Program.TexelBias = ParseFloatDefault(t, DefaultTexelBias) },
                 { "v|verbose", "Print verbose messages.", v => Program.Verbose = true },
                 { "h|help", "Display this help message.", h => Program.Help = true },
-				{ "c|cli", "Runs in the command line only, no gui.", c => Program.Cli = true }
-
             };
 
         /// <summary>

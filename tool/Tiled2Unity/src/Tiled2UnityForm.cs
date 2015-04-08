@@ -117,12 +117,6 @@ namespace Tiled2Unity
             this.buttonFolderBrowser.Enabled = true;
             this.buttonViewer.Enabled = true;
             CheckExportButton();
-			string exportDir = global::Tiled2Unity.Properties.Settings.Default.LastExportDirectory;
-			if (Program.Cli && Directory.Exists(exportDir)) {
-				this.tmxExporter = new TiledMapExporter(tmxMap);
-				this.tmxExporter.Export(exportDir);
-				Application.Exit ();
-			}
         }
 
         void CheckExportButton()
@@ -255,7 +249,6 @@ namespace Tiled2Unity
             {
                 Properties.Settings.Default.LastExportDirectory = Path.GetFullPath(dlg.SelectedPath);
                 Properties.Settings.Default.Save();
-                this.textBoxExportFolder.Text = Properties.Settings.Default.LastExportDirectory;
             }
         }
 
@@ -348,12 +341,10 @@ namespace Tiled2Unity
 
         private void addUnityPackageToProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			if (Type.GetType ("Mono.Runtime") == null) {// if running on windows
-				string path = System.Reflection.Assembly.GetExecutingAssembly ().Location;
-				string folder = Path.GetDirectoryName (path);
-				string package = Path.Combine (folder, "Tiled2Unity.unitypackage");
-				System.Diagnostics.Process.Start (package);
-			}//else, there is no way yet to determine how to install the package
+            string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            string folder = Path.GetDirectoryName(path);
+            string package = Path.Combine(folder, "Tiled2Unity.unitypackage");
+            System.Diagnostics.Process.Start(package);
         }
 
         private void textBoxScale_Validating(object sender, CancelEventArgs e)
@@ -382,6 +373,7 @@ namespace Tiled2Unity
                 this.textBoxScale.Text = "1.0";
             }
         }
+
     }
 }
 
